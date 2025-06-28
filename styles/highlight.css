@@ -1,0 +1,131 @@
+/* Couleurs pour le thème clair */
+.theme-light {
+    --color-nonBreakingSpace: rgba(225, 138, 232, 0.9);
+    --color-thin-space: rgba(109, 255, 73, 0.9);
+    --color-regular-space: rgba(75, 167, 209, 0.9);
+    --color-em-dash: rgba(232, 135, 135, 0.9);
+
+}
+
+/* Couleurs pour le thème sombre */
+.theme-dark {
+    --color-nonBreakingSpace: rgb(248, 116, 215);
+    --color-thin-space: rgba(63, 226, 255);
+    --color-regular-space: rgba(175, 140, 166);
+    --color-em-dash: rgba(135, 231, 231, 0.9);
+}
+
+:root{
+    --space-size: 1em;
+}
+
+/* Styles communs */
+.cm-line .nonBreakingSpace,
+.cm-line .thinSpace,
+.cm-line .regularSpace,
+.cm-line .em-dash {
+    position: relative;
+}
+
+/* Style pour l'espace insécable (espace normal) */
+.cm-line .nonBreakingSpace {
+    /* background-color: var(--color-nonBreakingSpace-bg);
+    border-radius: 2px; */
+}
+.cm-line .nonBreakingSpace::after {
+    content: '·';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--color-nonBreakingSpace);
+    font-size: var(--space-size);
+    pointer-events: none;
+    line-height: 100%;
+}
+
+/* Style pour l'espace fine insécable */
+.cm-line .thinSpace {
+    /* background-color: var(--color-thin-space-bg);
+    border-radius: 2px; */
+}
+.cm-line .thinSpace::after {
+    content: '·';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--color-thin-space);
+    font-size: var(--space-size);
+    pointer-events: none;
+    line-height: 100%;
+}
+
+/* Style pour l'espace normale */
+.cm-line .regularSpace {
+    /* background-color: var(--color-regular-space-bg);
+    border-radius: 2px; */
+}
+.cm-line .regularSpace::after {
+    content: '·';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--color-regular-space);
+    font-size: var(--space-size);
+    pointer-events: none;
+    line-height: 100%;
+}
+
+/* Style pour le tiret cadratin */
+.cm-line .em-dash {
+    /* color: var(--color-em-dash); */
+    /* background-color: var(--color-em-dash-bg); */
+    /* border-radius: 2px; */
+    /* padding: 0 1px; */
+}
+
+/* Ajout d'un style pour le bouton dans la barre d'état */
+#highlight-status-bar-button {
+    opacity: 0.5;
+    transition: opacity 0.2s ease;
+}
+
+#highlight-status-bar-button:hover {
+    opacity: 0.8;
+}
+
+#highlight-status-bar-button.highlight-enabled {
+    opacity: 1;
+}
+
+#highlight-status-bar-button .status-bar-item-icon {
+    font-weight: bold;
+    font-size: var(--space-size);
+    pointer-events: none;
+    line-height: 100%;
+}
+
+/* Pour les thèmes sombres, le bouton activé a une couleur légèrement différente */
+.theme-dark #highlight-status-bar-button.highlight-enabled {
+    color: var(--interactive-accent);
+}
+
+/* Pour les thèmes clairs, le bouton activé a une couleur légèrement différente */
+.theme-light #highlight-status-bar-button.highlight-enabled {
+    color: var(--interactive-accent);
+}
+
+
+.microtypographie-words-container{
+    
+}
+
+.microtypographie-info-content ul{
+    font-weight: 200;
+    padding-bottom:5px;
+}
+.microtypographie-info-content ul li{
+    padding-bottom:5px;
+}

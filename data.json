@@ -1,0 +1,14 @@
+{
+  "openDoubleQuote": "« ",
+  "closeDoubleQuote": " »",
+  "openSingleQuote": "’",
+  "closeSingleQuote": "‘",
+  "frenchRulesEnabled": true,
+  "dashesEnabled": true,
+  "skipEnDash": false,
+  "ellipsisEnabled": true,
+  "guillemetsEnabled": true,
+  "highlightEnabled": true,
+  "highlightButton": true,
+  "tabTitleBarButton": true
+}
