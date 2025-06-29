@@ -1,98 +1,214 @@
 /* ========================================
-   MICROTYPOGRAPHIE - STYLES UNIFIÉS
+   MICROTYPOGRAPHIE OBSIDIAN - CARACTÈRES INVISIBLES
    ======================================== */
+
+/* ========================================
+   VARIABLES CSS - THÈMES
+   ======================================== */
+
+:root {
+    --space-size: 1em;
+    --space-opacity: 0.6;
+}
+
 /* Couleurs pour le thème clair */
 .theme-light {
-    --color-nonBreakingSpace: rgba(225, 138, 232, 0.9);
-    --color-thin-space: rgba(109, 255, 73, 0.9);
-    --color-regular-space: rgba(75, 167, 209, 0.9);
-    --color-em-dash: rgba(232, 135, 135, 0.9);
-
+    --color-nonBreakingSpace: rgba(225, 138, 232, 0.9);    /* Violet - Espace insécable */
+    --color-thin-space: rgba(109, 255, 73, 0.9);           /* Vert - Espace fine insécable */
+    --color-regular-space: rgba(75, 167, 209, 0.9);        /* Bleu - Espace normale */
+    --color-em-dash: rgba(232, 135, 135, 0.9);             /* Rouge - Tiret cadratin */
+    --color-tab: rgba(255, 165, 0, 0.9);                   /* Orange - Tabulation */
+    --color-line-break: rgba(128, 128, 128, 0.9);          /* Gris - Saut de ligne */
 }
 
 /* Couleurs pour le thème sombre */
 .theme-dark {
-    --color-nonBreakingSpace: rgb(248, 116, 215);
-    --color-thin-space: rgba(63, 226, 255);
-    --color-regular-space: rgba(175, 140, 166);
-    --color-em-dash: rgba(135, 231, 231, 0.9);
+    --color-nonBreakingSpace: rgb(248, 116, 215);          /* Rose - Espace insécable */
+    --color-thin-space: rgba(63, 226, 255, 0.9);           /* Cyan - Espace fine insécable */
+    --color-regular-space: rgba(175, 140, 166, 0.9);       /* Mauve - Espace normale */
+    --color-em-dash: rgba(135, 231, 231, 0.9);             /* Cyan clair - Tiret cadratin */
+    --color-tab: rgba(255, 200, 100, 0.9);                 /* Orange clair - Tabulation */
+    --color-line-break: rgba(200, 200, 200, 0.9);          /* Gris clair - Saut de ligne */
 }
 
-:root{
-    --space-size: 1em;
-}
+/* ========================================
+   STYLES CODEMIRROR - CARACTÈRES INVISIBLES
+   ======================================== */
 
-/* Styles communs */
+/* Styles communs pour tous les caractères invisibles */
 .cm-line .nonBreakingSpace,
 .cm-line .thinSpace,
 .cm-line .regularSpace,
-.cm-line .em-dash {
+.cm-line .em-dash,
+.cm-line .tab-char,
+.cm-line .line-break {
     position: relative;
 }
 
-/* Style pour l'espace insécable (espace normal) */
-.cm-line .nonBreakingSpace {
-    /* background-color: var(--color-nonBreakingSpace-bg);
-    border-radius: 2px; */
-}
+/* ===== ESPACE INSÉCABLE (U+00A0) ===== */
 .cm-line .nonBreakingSpace::after {
-    content: '·';
+    content: '⍽';  /* U+237D - Shouldered open box */
     position: absolute;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
     color: var(--color-nonBreakingSpace);
     font-size: var(--space-size);
+    font-family: "Noto Sans Symbols", "DejaVu Sans", "Arial Unicode MS", monospace;
     pointer-events: none;
     line-height: 100%;
+    opacity: var(--space-opacity);
 }
 
-/* Style pour l'espace fine insécable */
-.cm-line .thinSpace {
-    /* background-color: var(--color-thin-space-bg);
-    border-radius: 2px; */
+/* Fallback si le caractère ⍽ n'est pas disponible */
+.cm-line .nonBreakingSpace::before {
+    content: '◦';  /* U+25E6 - White bullet (fallback) */
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--color-nonBreakingSpace);
+    font-size: calc(var(--space-size) * 1.2);
+    font-family: system-ui, -apple-system, sans-serif;
+    pointer-events: none;
+    line-height: 100%;
+    opacity: var(--space-opacity);
+    z-index: -1; /* Derrière le ::after */
 }
+
+/* ===== ESPACE FINE INSÉCABLE (U+202F) ===== */
 .cm-line .thinSpace::after {
-    content: '·';
+    content: '␣';  /* U+2423 - Open box */
     position: absolute;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
     color: var(--color-thin-space);
-    font-size: var(--space-size);
+    font-size: calc(var(--space-size) * 0.8);
+    font-family: "Noto Sans Symbols", "DejaVu Sans", "Arial Unicode MS", monospace;
     pointer-events: none;
     line-height: 100%;
+    opacity: var(--space-opacity);
 }
 
-/* Style pour l'espace normale */
-.cm-line .regularSpace {
-    /* background-color: var(--color-regular-space-bg);
-    border-radius: 2px; */
+/* Fallback pour espace fine */
+.cm-line .thinSpace::before {
+    content: '▫';  /* U+25AB - White small square (fallback) */
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--color-thin-space);
+    font-size: calc(var(--space-size) * 0.7);
+    font-family: system-ui, -apple-system, sans-serif;
+    pointer-events: none;
+    line-height: 100%;
+    opacity: var(--space-opacity);
+    z-index: -1;
 }
+
+/* ===== ESPACE NORMALE (U+0020) ===== */
 .cm-line .regularSpace::after {
-    content: '·';
+    content: '·';  /* U+00B7 - Middle dot */
     position: absolute;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
     color: var(--color-regular-space);
     font-size: var(--space-size);
+    font-family: system-ui, -apple-system, sans-serif;
     pointer-events: none;
     line-height: 100%;
+    opacity: var(--space-opacity);
 }
 
-/* Style pour le tiret cadratin */
-.cm-line .em-dash {
-    /* color: var(--color-em-dash); */
-    /* background-color: var(--color-em-dash-bg); */
-    /* border-radius: 2px; */
-    /* padding: 0 1px; */
+/* ===== TIRET CADRATIN (U+2014) ===== */
+.cm-line .em-dash::after {
+    content: '—';  /* U+2014 - Em dash */
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--color-em-dash);
+    font-size: var(--space-size);
+    font-family: system-ui, -apple-system, sans-serif;
+    pointer-events: none;
+    line-height: 100%;
+    opacity: var(--space-opacity);
+    font-weight: bold;
 }
 
-/* Ajout d'un style pour le bouton dans la barre d'état */
+/* ===== TABULATION (U+0009) ===== */
+.cm-line .tab-char::after {
+    content: '→';  /* U+2192 - Rightwards arrow */
+    position: absolute;
+    left: 2px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-tab);
+    font-size: var(--space-size);
+    font-family: system-ui, -apple-system, sans-serif;
+    pointer-events: none;
+    line-height: 100%;
+    opacity: var(--space-opacity);
+}
+
+/* Fallback pour la flèche */
+.cm-line .tab-char::before {
+    content: '»';  /* U+00BB - Right-pointing double angle quotation mark */
+    position: absolute;
+    left: 2px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-tab);
+    font-size: var(--space-size);
+    font-family: system-ui, -apple-system, sans-serif;
+    pointer-events: none;
+    line-height: 100%;
+    opacity: var(--space-opacity);
+    z-index: -1;
+}
+
+/* ===== SAUT DE LIGNE ===== */
+.cm-line .line-break::after {
+    content: '¶';  /* U+00B6 - Pilcrow sign */
+    position: absolute;
+    right: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-line-break);
+    font-size: var(--space-size);
+    font-family: system-ui, -apple-system, sans-serif;
+    pointer-events: none;
+    line-height: 100%;
+    opacity: var(--space-opacity);
+}
+
+/* Fallback pour le pilcrow */
+.cm-line .line-break::before {
+    content: '↵';  /* U+21B5 - Downwards arrow with corner leftwards */
+    position: absolute;
+    right: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-line-break);
+    font-size: var(--space-size);
+    font-family: system-ui, -apple-system, sans-serif;
+    pointer-events: none;
+    line-height: 100%;
+    opacity: var(--space-opacity);
+    z-index: -1;
+}
+
+/* ========================================
+   BOUTON DE CONTRÔLE - BARRE D'ÉTAT
+   ======================================== */
+
+/* Bouton d'activation/désactivation dans la barre d'état */
 #highlight-status-bar-button {
     opacity: 0.5;
     transition: opacity 0.2s ease;
+    cursor: pointer;
 }
 
 #highlight-status-bar-button:hover {
@@ -110,25 +226,171 @@
     line-height: 100%;
 }
 
-/* Pour les thèmes sombres, le bouton activé a une couleur légèrement différente */
+/* Couleurs spécifiques selon le thème */
 .theme-dark #highlight-status-bar-button.highlight-enabled {
     color: var(--interactive-accent);
 }
 
-/* Pour les thèmes clairs, le bouton activé a une couleur légèrement différente */
 .theme-light #highlight-status-bar-button.highlight-enabled {
     color: var(--interactive-accent);
 }
 
+/* ========================================
+   BOUTON DANS LA BARRE DE TITRE
+   ======================================== */
 
-.microtypographie-words-container{
-    
+/* Bouton d'activation dans la barre de titre des onglets */
+#highlight-tab-title-button {
+    opacity: 0.6;
+    transition: opacity 0.2s ease;
+    margin-right: 8px;
 }
 
-.microtypographie-info-content ul{
+#highlight-tab-title-button:hover {
+    opacity: 0.9;
+}
+
+#highlight-tab-title-button.highlight-enabled {
+    opacity: 1;
+    color: var(--interactive-accent);
+}
+
+/* ========================================
+   CONFIGURATION ET INFO
+   ======================================== */
+
+/* Container pour les paramètres */
+.microtypographie-words-container {
+    margin: 1em 0;
+    padding: 1em;
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 8px;
+}
+
+/* Styles pour les listes d'information */
+.microtypographie-info-content ul {
     font-weight: 200;
-    padding-bottom:5px;
+    padding-bottom: 5px;
+    margin-left: 20px;
 }
-.microtypographie-info-content ul li{
-    padding-bottom:5px;
+
+.microtypographie-info-content ul li {
+    padding-bottom: 5px;
+    list-style-type: disc;
 }
+
+/* ========================================
+   CLASSES UTILITAIRES
+   ======================================== */
+
+/* Classe pour désactiver temporairement la visualisation */
+.hide-invisible-chars .cm-line .nonBreakingSpace::after,
+.hide-invisible-chars .cm-line .thinSpace::after,
+.hide-invisible-chars .cm-line .regularSpace::after,
+.hide-invisible-chars .cm-line .em-dash::after,
+.hide-invisible-chars .cm-line .tab-char::after,
+.hide-invisible-chars .cm-line .line-break::after {
+    display: none;
+}
+
+/* Classe pour utiliser uniquement les fallbacks */
+.use-fallback-chars .cm-line .nonBreakingSpace::after,
+.use-fallback-chars .cm-line .thinSpace::after,
+.use-fallback-chars .cm-line .tab-char::after,
+.use-fallback-chars .cm-line .line-break::after {
+    display: none;
+}
+
+.use-fallback-chars .cm-line .nonBreakingSpace::before,
+.use-fallback-chars .cm-line .thinSpace::before,
+.use-fallback-chars .cm-line .tab-char::before,
+.use-fallback-chars .cm-line .line-break::before {
+    z-index: 1;
+}
+
+/* Classe pour ajuster l'opacité */
+.low-opacity-chars {
+    --space-opacity: 0.3;
+}
+
+.high-opacity-chars {
+    --space-opacity: 0.9;
+}
+
+/* ========================================
+   RESPONSIVE ET ACCESSIBILITÉ
+   ======================================== */
+
+/* Réduction de la taille sur petits écrans */
+@media (max-width: 768px) {
+    :root {
+        --space-size: 0.9em;
+    }
+}
+
+/* Respect des préférences d'animations réduites */
+@media (prefers-reduced-motion: reduce) {
+    #highlight-status-bar-button,
+    #highlight-tab-title-button {
+        transition: none;
+    }
+}
+
+/* Mode contraste élevé */
+@media (prefers-contrast: high) {
+    :root {
+        --space-opacity: 1;
+    }
+    
+    .cm-line .nonBreakingSpace::after,
+    .cm-line .thinSpace::after,
+    .cm-line .regularSpace::after,
+    .cm-line .em-dash::after,
+    .cm-line .tab-char::after,
+    .cm-line .line-break::after {
+        font-weight: bold;
+        text-shadow: 0 0 1px currentColor;
+    }
+}
+
+/* ========================================
+   GUIDE VISUEL DES CARACTÈRES
+   ======================================== */
+
+/* Légende pour aider à identifier les caractères */
+.invisible-chars-legend {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--background-primary);
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 0.8em;
+    z-index: 1000;
+    display: none;
+}
+
+.invisible-chars-legend.visible {
+    display: block;
+}
+
+.invisible-chars-legend .legend-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.invisible-chars-legend .legend-symbol {
+    margin-right: 8px;
+    font-weight: bold;
+    width: 20px;
+    text-align: center;
+}
+
+.invisible-chars-legend .legend-symbol.nbsp { color: var(--color-nonBreakingSpace); }
+.invisible-chars-legend .legend-symbol.thin { color: var(--color-thin-space); }
+.invisible-chars-legend .legend-symbol.space { color: var(--color-regular-space); }
+.invisible-chars-legend .legend-symbol.dash { color: var(--color-em-dash); }
+.invisible-chars-legend .legend-symbol.tab { color: var(--color-tab); }
+.invisible-chars-legend .legend-symbol.br { color: var(--color-line-break); }
