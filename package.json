@@ -6,8 +6,7 @@
   "scripts": {
     "dev": "node esbuild.config.js",
     "build": "tsc -noEmit -skipLibCheck && node esbuild.config.js production",
-    "version": "node version-bump.js",
-    "lint": "eslint 'src/**/*.ts'"
+    "version": "node version-bump.js"
   },
   "keywords": [
     "French",
