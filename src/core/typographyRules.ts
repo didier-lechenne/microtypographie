@@ -33,10 +33,7 @@ const FRENCH_RULES: TypographicRule[] = [
 
     // delete all spaces after «‹“[(
   { reg: /([«‹"\[(])\s+/g, repl: "$1" },
-  // french open quotes
-  { reg: /\"([A-Za-zÀ-ÖØ-öø-ÿœŒ])/g, repl: "«\u202F$1" },
-  // french close quotes - version améliorée
-  { reg: /([^\s][!?;:.,]?)\s*\"/g, repl: "$1\u202F»" },
+
   // real apostrophe
   { reg: /\'/g, repl: "’" },
   // real suspension points
