@@ -1135,7 +1135,7 @@ var Microtypographie = class extends import_obsidian3.Plugin {
     this.batchModule = new BatchTypographyModule(this.settings);
     this.addSettingTab(new MicrotypographieSettingTab(this.app, this));
     this.registerDomEvent(document, "keydown", this.handleKeyDown.bind(this));
-    await injectCSSFromFile(this, "styles/highlight.css");
+    await injectCSSFromFile(this, "styles/styles.css");
     this.registerEditorExtension(createDecorations(this.settings));
     if (this.settings.highlightButton) {
       this.statusBarButton = createStatusBarButton(
