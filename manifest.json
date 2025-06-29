@@ -2,7 +2,7 @@
   "id": "microtypographie",
   "name": "Microtypographie",
   "version": "1.0.3",
-  "minAppVersion": "1.0.1",
+  "minAppVersion": "1.4.0",
   "description": "Automatic typographic apostrophe, French quotation marks and dialog mark for Obsidian",
   "author": "Didier Lechenne",
   "authorUrl": "https://gitlab.com/dlechenne/microtypographie",
