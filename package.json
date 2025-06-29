@@ -1,34 +1,33 @@
 {
-	"name": "microtypographie",
-	"version": "1.0.2",
-	"description": "Automatic typographic apostrophe, French quotation marks and dialog mark",
-	"main": "main.js",
-	"scripts": {
-	  "dev": "node esbuild.config.js",
-	  "build": "tsc -noEmit -skipLibCheck && node esbuild.config.js production",
-	  "version": "node version-bump.js",
-	  "lint": "eslint 'src/**/*.ts'"
-	},
-	"keywords": [
-	  "French",
-	  "typographic",
-	  "keyboard"
-	],
-	"author": "dLechenne",
-	"license": "MIT",
-	"repository": {
-	  "type": "git",
-	  "url": ""
-	},
-	"devDependencies": {
-	  "@types/node": "^20.0.0",
-	  "@typescript-eslint/eslint-plugin": "^7.0.0",
-	  "@typescript-eslint/parser": "^7.0.0",
-	  "builtin-modules": "^3.3.0",
-	  "esbuild": "^0.20.0",
-	  "obsidian": "latest",
-	  "tslib": "^2.6.0",
-	  "typescript": "^5.0.0"
-	}
-	  
+  "name": "microtypographie",
+  "version": "1.0.4",
+  "description": "Automatic typographic apostrophe, French quotation marks and dialog mark for Obsidian",
+  "main": "main.js",
+  "scripts": {
+    "dev": "node esbuild.config.js",
+    "build": "tsc -noEmit -skipLibCheck && node esbuild.config.js production",
+    "version": "node version-bump.js",
+    "lint": "eslint 'src/**/*.ts'"
+  },
+  "keywords": [
+    "French",
+    "typographic",
+    "keyboard"
+  ],
+  "author": "dLechenne",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "builtin-modules": "^3.3.0",
+    "esbuild": "^0.20.0",
+    "obsidian": "latest",
+    "tslib": "^2.6.0",
+    "typescript": "^5.0.0"
   }
+}
