@@ -137,11 +137,11 @@ class CompiledTypographyRules {
         { reg: /(X|I|V)(er|e)/g, repl: "$1<sup>$2</sup>" },
 
         // Guillemets imbriqués
-        { reg: /(«\u202F[^»]*)'([^']*)'([^»]*\u202F»)/g, repl: '$1"$2"$3' },
-        { reg: /(«\u202F[^»]*)«\u202F([^»]*)\u202F»([^»]*\u202F»)/g, repl: '$1"$2"$3' },
+        { reg: /(«\u202F[^»]*)'([^']*)'([^»]*\u202F»)/g, repl: '$1“$2”$3' },
+        { reg: /(«\u202F[^»]*)«\u202F([^»]*)\u202F»([^»]*\u202F»)/g, repl: '$1“$2”$3' },
 
         // Espace après guillemet fermant
-        { reg: /(»)([A-Za-zÀ-ÖØ-öø-ÿœŒ0-9])/g, repl: "$1 $2" }
+        // { reg: /(»)([A-Za-zÀ-ÖØ-öø-ÿœŒ0-9])/g, repl: "$1 $2" }
       );
     }
 

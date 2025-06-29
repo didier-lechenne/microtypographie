@@ -24,8 +24,8 @@ export interface MicrotypographieSettings {
 export const DEFAULT_SETTINGS: MicrotypographieSettings = {
     openDoubleQuote: "«\u202F",  // Guillemet français ouvrant avec espace fine insécable
     closeDoubleQuote: "\u202F»", // Guillemet français fermant avec espace fine insécable
-    openSingleQuote: "’",        // Apostrophe typographique
-    closeSingleQuote: "‘",       // Apostrophe typographique
+    openSingleQuote: "“",        // Apostrophe typographique
+    closeSingleQuote: "”",       // Apostrophe typographique
     frenchRulesEnabled: true,
     dashesEnabled: true,
     skipEnDash: false,

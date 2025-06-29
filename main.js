@@ -35,9 +35,9 @@ var DEFAULT_SETTINGS = {
   // Guillemet français ouvrant avec espace fine insécable
   closeDoubleQuote: "\u202F\xBB",
   // Guillemet français fermant avec espace fine insécable
-  openSingleQuote: "\u2019",
+  openSingleQuote: "\u201C",
   // Apostrophe typographique
-  closeSingleQuote: "\u2018",
+  closeSingleQuote: "\u201D",
   // Apostrophe typographique
   frenchRulesEnabled: true,
   dashesEnabled: true,
@@ -900,10 +900,10 @@ var CompiledTypographyRules = class {
         // Exposants après siècles
         { reg: /(X|I|V)(er|e)/g, repl: "$1<sup>$2</sup>" },
         // Guillemets imbriqués
-        { reg: /(«\u202F[^»]*)'([^']*)'([^»]*\u202F»)/g, repl: '$1"$2"$3' },
-        { reg: /(«\u202F[^»]*)«\u202F([^»]*)\u202F»([^»]*\u202F»)/g, repl: '$1"$2"$3' },
+        { reg: /(«\u202F[^»]*)'([^']*)'([^»]*\u202F»)/g, repl: "$1\u201C$2\u201D$3" },
+        { reg: /(«\u202F[^»]*)«\u202F([^»]*)\u202F»([^»]*\u202F»)/g, repl: "$1\u201C$2\u201D$3" }
         // Espace après guillemet fermant
-        { reg: /(»)([A-Za-zÀ-ÖØ-öø-ÿœŒ0-9])/g, repl: "$1 $2" }
+        // { reg: /(»)([A-Za-zÀ-ÖØ-öø-ÿœŒ0-9])/g, repl: "$1 $2" }
       );
     }
     const dashRules = [];

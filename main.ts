@@ -18,9 +18,6 @@ import { BatchTypographyModule } from './src/modules/batchTypography';
 
 import { EditorView } from "@codemirror/view";
 
-
-
-
 export default class Microtypographie extends Plugin {
     settings: MicrotypographieSettings;
     private statusBarButton: HTMLElement | null = null;
