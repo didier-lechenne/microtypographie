@@ -64,11 +64,11 @@ const FRENCH_RULES: TypographicRule[] = [
   // add sub
   { reg: /(X|I|V)(er|e)/g, repl: "$1<sup>$2</sup>" },
   // Transformer les guillemets simples à l'intérieur de guillemets doubles en guillemets anglais
-  { reg: /(«\u202F[^»]*)'([^']*)'([^»]*\u202F»)/g, repl: '$1"$2"$3' },
+  { reg: /(«\u202F[^»]*)'([^']*)'([^»]*\u202F»)/g, repl: '$1“$2”$3' },
   // ajouter espace après guillemet fermant suivi d'un mot
   { reg: /(»)([A-Za-zÀ-ÖØ-öø-ÿœŒ0-9])/g, repl: "$1 $2" },
   // Transformer les guillemets simples à l'intérieur de guillemets doubles en guillemets anglais
-  { reg: /(«\u202F[^»]*)«\u202F([^»]*)\u202F»([^»]*\u202F»)/g, repl: '$1"$2"$3'  },
+  { reg: /(«\u202F[^»]*)«\u202F([^»]*)\u202F»([^»]*\u202F»)/g, repl: '$1“$2”$3'  },
 ];
 
 // Règles de base pour les espaces (non spécifiques au français)
@@ -160,10 +160,10 @@ function processQuotes(text: string, openQuote: string, closeQuote: string): str
       const segment2 = segments[2]; // Contenu entre 2e et 3e guillemet (potentiellement imbriqué)
       const segment3 = segments[3]; // Contenu entre 3e et 4e guillemet
       
-      console.log(`🔍 Analyse des segments:`);
-      console.log(`  Segment 1: "${segment1}"`);
-      console.log(`  Segment 2: "${segment2}"`);
-      console.log(`  Segment 3: "${segment3}"`);
+      // console.log(`🔍 Analyse des segments:`);
+      // console.log(`  Segment 1: "${segment1}"`);
+      // console.log(`  Segment 2: "${segment2}"`);
+      // console.log(`  Segment 3: "${segment3}"`);
       
       // LOGIQUE SIMPLE : si segment3 commence par minuscule ou espace+minuscule = continuation = imbrication
       const segment3StartsWithLowercase = /^\s*[a-zà-ÿ]/.test(segment3);
@@ -220,21 +220,21 @@ export function applyRules(text: string, rules: TypographicRule[], settings?: Mi
     const before = result;
     result = result.replace(rule.reg, rule.repl);
     if (before !== result) {
-      console.log("🔄 Règle appliquée:");
-      console.log("   Regex:", rule.reg);
-      console.log("   Avant:", before);
-      console.log("   Après:", result);
-      console.log("---");
+      // console.log("🔄 Règle appliquée:");
+      // console.log("   Regex:", rule.reg);
+      // console.log("   Avant:", before);
+      // console.log("   Après:", result);
+      // console.log("---");
     }
   }
   
   // Traitement spécial des guillemets si des paramètres sont fournis
   if (settings && result.includes("QUOTE_PLACEHOLDER")) {
-    console.log("🔄 Traitement des guillemets par alternance");
-    console.log("   Avant:", result);
+    // console.log("🔄 Traitement des guillemets par alternance");
+    // console.log("   Avant:", result);
     result = processQuotes(result, settings.openDoubleQuote, settings.closeDoubleQuote);
-    console.log("   Après:", result);
-    console.log("---");
+    // console.log("   Après:", result);
+    // console.log("---");
   }
   
   return result;
