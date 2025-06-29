@@ -79,7 +79,7 @@ const FRENCH_RULES: TypographicRule[] = [
 
 // Règles de base pour les espaces (non spécifiques au français)
 const BASE_RULES: TypographicRule[] = [
-  // Règles minimales pour les espaces qui ne sont pas spécifiques au français
+
 ];
 
 /**
