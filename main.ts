@@ -42,7 +42,7 @@ export default class Microtypographie extends Plugin {
         this.registerDomEvent(document, 'keydown', this.handleKeyDown.bind(this));
     
         // Injecter le CSS pour la mise en évidence
-        await injectCSSFromFile(this, "styles/styles.css");
+        await injectCSSFromFile(this, "styles.css");
 
         // Enregistrer l'extension de l'éditeur pour les décorations
         this.registerEditorExtension(createDecorations(this.settings));

@@ -97,7 +97,7 @@ export function compileRules(
       repl: settings.openDoubleQuote + "$1",
     },
     {
-      reg: new RegExp(`([A-Za-zÀ-ÖØ-öø-ÿœŒ][!?;:.,]?)\"`, "g"),
+      reg: new RegExp(`([A-Za-zÀ-ÖØ-öø-ÿœŒ](?:\\s*[!?;:.,])?)\\s*"`, "g"),
       repl: "$1" + settings.closeDoubleQuote,
     },
     // Apostrophe typographique personnalisable
@@ -156,7 +156,17 @@ export function compileRules(
 export function applyRules(text: string, rules: TypographicRule[]): string {
   let result = text;
   for (const rule of rules) {
+    const before = result;
     result = result.replace(rule.reg, rule.repl);
+    
+    // Log seulement si il y a eu un changement
+    if (before !== result) {
+      console.log("🔄 Règle appliquée:");
+      console.log("   Regex:", rule.reg);
+      console.log("   Avant:", before);
+      console.log("   Après:", result);
+      console.log("---");
+    }
   }
   return result;
 }
