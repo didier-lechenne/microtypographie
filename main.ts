@@ -18,6 +18,9 @@ import { BatchTypographyModule } from './src/modules/batchTypography';
 
 import { EditorView } from "@codemirror/view";
 
+
+
+
 export default class Microtypographie extends Plugin {
     settings: MicrotypographieSettings;
     private statusBarButton: HTMLElement | null = null;
@@ -171,6 +174,8 @@ export default class Microtypographie extends Plugin {
     async saveSettings() {
         await this.saveData(this.settings);
         
+      
+
         // Mettre à jour les modules avec les nouveaux paramètres
         this.liveModule.updateSettings(this.settings);
         this.batchModule.updateSettings(this.settings);

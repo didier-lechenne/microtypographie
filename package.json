@@ -1,12 +1,12 @@
 {
 	"name": "microtypographie",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"description": "Automatic typographic apostrophe, French quotation marks and dialog mark",
 	"main": "main.js",
 	"scripts": {
 	  "dev": "node esbuild.config.js",
 	  "build": "tsc -noEmit -skipLibCheck && node esbuild.config.js production",
-	  "version": "node version-bump.js && git add manifest.json versions.json",
+	  "version": "node version-bump.js",
 	  "lint": "eslint 'src/**/*.ts'"
 	},
 	"keywords": [
