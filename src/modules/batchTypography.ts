@@ -60,8 +60,7 @@ export class BatchTypographyModule {
        
         editor.replaceSelection(processedText);
         
-        // Restaurer la sélection
-        // editor.setSelection(selectionStart, selectionEnd);
+   
         
         return true;
     }
