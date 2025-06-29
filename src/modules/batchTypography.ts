@@ -57,11 +57,11 @@ export class BatchTypographyModule {
             return false;
         }
         
-        // Remplacer uniquement le texte sélectionné
+       
         editor.replaceSelection(processedText);
         
         // Restaurer la sélection
-        editor.setSelection(selectionStart, selectionEnd);
+        // editor.setSelection(selectionStart, selectionEnd);
         
         return true;
     }

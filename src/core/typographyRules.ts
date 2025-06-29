@@ -62,7 +62,7 @@ const FRENCH_RULES: TypographicRule[] = [
   // no break space before 'siècles'
   { reg: /(X|I|V)(er|e)\s+siècle/g, repl: "$1$2\u00A0siècle" },
   // add sub
-  { reg: /(X|I|V)(er|e)/g, repl: "$1<sup>$2</sup>" },
+  { reg: /(\s|^)(\d+|[IVX]+)(er|e|ème|eme)(\s|$)/gi, repl: "$1$2<sup>$3</sup>$4" },
   // Transformer les guillemets simples à l'intérieur de guillemets doubles en guillemets anglais
   { reg: /(«\u202F[^»]*)'([^']*)'([^»]*\u202F»)/g, repl: '$1“$2”$3' },
   // ajouter espace après guillemet fermant suivi d'un mot
