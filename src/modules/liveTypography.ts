@@ -6,6 +6,7 @@ import { isInSpecialBlock, isInPreservedMarkdown } from '../utils/helpers';
 
 export class LiveTypographyModule {
     private settings: MicrotypographieSettings;
+    private openQuote: boolean = true;
     
     constructor(settings: MicrotypographieSettings) {
         this.settings = settings;
@@ -19,6 +20,11 @@ export class LiveTypographyModule {
         this.settings = settings;
     }
 
+
+    public resetQuoteState(): void {
+        this.openQuote = true;
+    }
+    
     /**
      * Gère les événements clavier pour appliquer les règles typographiques en temps réel
      * @param event Événement clavier
@@ -92,16 +98,24 @@ export class LiveTypographyModule {
         else if (event.key === '"') {
             event.preventDefault();
             
-            // Insérer la paire complète de guillemets personnalisés avec le curseur au milieu
-            const quoteSet = this.settings.openDoubleQuote + this.settings.closeDoubleQuote;
-            editor.replaceRange(quoteSet, cursor);
+            if (this.openQuote) {
+                // Insérer le guillemet ouvrant
+                editor.replaceRange(this.settings.openDoubleQuote, cursor);
+                editor.setCursor({ 
+                    line: cursor.line, 
+                    ch: cursor.ch + this.settings.openDoubleQuote.length 
+                });
+            } else {
+                // Insérer le guillemet fermant
+                editor.replaceRange(this.settings.closeDoubleQuote, cursor);
+                editor.setCursor({ 
+                    line: cursor.line, 
+                    ch: cursor.ch + this.settings.closeDoubleQuote.length 
+                });
+            }
             
-            // Placer le curseur entre les guillemets
-            editor.setCursor({ 
-                line: cursor.line, 
-                ch: cursor.ch + this.settings.openDoubleQuote.length 
-            });
-            
+            // Alterner pour le prochain guillemet
+            this.openQuote = !this.openQuote;
             handled = true;
         }
         

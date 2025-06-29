@@ -643,6 +643,7 @@ async function injectCSSFromFile(plugin, fileName) {
 // src/modules/liveTypography.ts
 var LiveTypographyModule = class {
   constructor(settings) {
+    this.openQuote = true;
     this.settings = settings;
   }
   /**
@@ -651,6 +652,9 @@ var LiveTypographyModule = class {
    */
   updateSettings(settings) {
     this.settings = settings;
+  }
+  resetQuoteState() {
+    this.openQuote = true;
   }
   /**
    * Gère les événements clavier pour appliquer les règles typographiques en temps réel
@@ -710,12 +714,20 @@ var LiveTypographyModule = class {
       handled = true;
     } else if (event.key === '"') {
       event.preventDefault();
-      const quoteSet = this.settings.openDoubleQuote + this.settings.closeDoubleQuote;
-      editor.replaceRange(quoteSet, cursor);
-      editor.setCursor({
-        line: cursor.line,
-        ch: cursor.ch + this.settings.openDoubleQuote.length
-      });
+      if (this.openQuote) {
+        editor.replaceRange(this.settings.openDoubleQuote, cursor);
+        editor.setCursor({
+          line: cursor.line,
+          ch: cursor.ch + this.settings.openDoubleQuote.length
+        });
+      } else {
+        editor.replaceRange(this.settings.closeDoubleQuote, cursor);
+        editor.setCursor({
+          line: cursor.line,
+          ch: cursor.ch + this.settings.closeDoubleQuote.length
+        });
+      }
+      this.openQuote = !this.openQuote;
       handled = true;
     } else if (event.key === "." && this.settings.ellipsisEnabled) {
       const textBefore = editor.getRange(
