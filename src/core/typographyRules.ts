@@ -1,4 +1,4 @@
-// Fichier typographyRules.ts simplifié
+// Fichier typographyRules.ts avec une solution simple pour l'imbrication
 
 import { MicrotypographieSettings } from "../settings/settings";
 
@@ -85,23 +85,14 @@ export function compileRules(
   // Initialiser le tableau de règles
   let frenchRules: TypographicRule[] = [];
 
-  // Règles pour les guillemets - approche par alternance
+  // Règles pour les guillemets - VERSION SIMPLIFIÉE
   frenchRules.push(
-    // Remplacer tous les guillemets par une fonction personnalisée
+    // Remplacer tous les guillemets par un placeholder UNIQUEMENT
     {
       reg: /"/g,
       repl: "QUOTE_PLACEHOLDER"
-    },
-    // Nettoyer tous les espaces après les placeholders de guillemets ouvrants
-    {
-      reg: /QUOTE_PLACEHOLDER\s+/g,
-      repl: "QUOTE_PLACEHOLDER"
-    },
-    // Nettoyer tous les espaces avant les placeholders de guillemets fermants
-    {
-      reg: /\s+QUOTE_PLACEHOLDER/g,
-      repl: "QUOTE_PLACEHOLDER"
     }
+    // PLUS de règles de suppression d'espaces qui cassent la détection !
   );
 
   // Apostrophe typographique personnalisable
@@ -151,72 +142,67 @@ export function compileRules(
 }
 
 /**
- * Traite les guillemets avec détection simple de l'imbrication par proximité
- * @param text Texte avec les placeholders QUOTE_PLACEHOLDER
- * @param openQuote Guillemet français ouvrant
- * @param closeQuote Guillemet français fermant
- * @returns Texte avec les guillemets traités
+ * LOGIQUE SIMPLIFIÉE : 4 guillemets = imbrication, sauf si séparés par fin de phrase
+ * Si le texte continue après le 3e guillemet (sans majuscule) = imbrication
  */
 function processQuotes(text: string, openQuote: string, closeQuote: string): string {
   let result = text;
   
-  // Stratégie simple : chercher les paires de guillemets "proches" (imbriqués)
-  // et les traiter différemment des paires "éloignées" (séparées)
+  // Compter les guillemets
+  const totalQuotes = (result.match(/QUOTE_PLACEHOLDER/g) || []).length;
   
-  // Trouver toutes les positions
-  const positions = [];
-  let index = 0;
-  while ((index = result.indexOf("QUOTE_PLACEHOLDER", index)) !== -1) {
-    positions.push(index);
-    index += "QUOTE_PLACEHOLDER".length;
-  }
-  
-  // Grouper les guillemets par proximité
-  const groups = [];
-  let currentGroup = [];
-  
-  for (let i = 0; i < positions.length; i++) {
-    currentGroup.push(i);
+  if (totalQuotes === 4) {
+    // Diviser le texte en segments par les guillemets
+    const segments = result.split('QUOTE_PLACEHOLDER');
     
-    // Si c'est le dernier ou si le suivant est "loin", fermer le groupe
-    if (i === positions.length - 1 || 
-        (i < positions.length - 1 && 
-         positions[i + 1] - positions[i] > 100)) { // Plus de 100 caractères = groupe séparé
+    if (segments.length === 5) {
+      const segment1 = segments[1]; // Contenu entre 1er et 2e guillemet
+      const segment2 = segments[2]; // Contenu entre 2e et 3e guillemet (potentiellement imbriqué)
+      const segment3 = segments[3]; // Contenu entre 3e et 4e guillemet
       
-      groups.push([...currentGroup]);
-      currentGroup = [];
-    }
-  }
-  
-  // Déterminer le type de chaque guillemet
-  const replacements = new Array(positions.length);
-  
-  for (const group of groups) {
-    if (group.length === 2) {
-      // Groupe de 2 = paire simple
-      replacements[group[0]] = openQuote;  // ouvrant
-      replacements[group[1]] = closeQuote; // fermant
-    } else if (group.length === 4) {
-      // Groupe de 4 = imbrication probable
-      replacements[group[0]] = openQuote;  // ouvrant principal
-      replacements[group[1]] = ' “';        // ouvrant imbriqué
-      replacements[group[2]] = '” ';        // fermant imbriqué
-      replacements[group[3]] = closeQuote; // fermant principal
-    } else {
-      // Autres cas : alternance simple dans le groupe
-      for (let i = 0; i < group.length; i++) {
-        const isOpening = (i % 2 === 0);
-        replacements[group[i]] = isOpening ? openQuote : closeQuote;
+      console.log(`🔍 Analyse des segments:`);
+      console.log(`  Segment 1: "${segment1}"`);
+      console.log(`  Segment 2: "${segment2}"`);
+      console.log(`  Segment 3: "${segment3}"`);
+      
+      // LOGIQUE SIMPLE : si segment3 commence par minuscule ou espace+minuscule = continuation = imbrication
+      const segment3StartsWithLowercase = /^\s*[a-zà-ÿ]/.test(segment3);
+      
+      // OU si segment2 est relativement court (< 50 caractères) ET segment3 n'est pas vide
+      const segment2IsShort = segment2.length < 50;
+      const segment3NotEmpty = segment3.trim().length > 0;
+      
+      if ((segment3StartsWithLowercase && segment3NotEmpty) || 
+          (segment2IsShort && segment3NotEmpty && segment3StartsWithLowercase)) {
+        
+        // console.log(`✅ Imbrication détectée`);
+        // console.log(`  segment3StartsWithLowercase: ${segment3StartsWithLowercase}`);
+        // console.log(`  segment2IsShort: ${segment2IsShort}`);
+        
+        // Imbrication : français à l'extérieur, anglais à l'intérieur
+        let tempResult = result;
+        tempResult = tempResult.replace(/QUOTE_PLACEHOLDER/, openQuote);     // 1er : «
+        tempResult = tempResult.replace(/QUOTE_PLACEHOLDER/, '“');           // 2e : "
+        tempResult = tempResult.replace(/QUOTE_PLACEHOLDER/, '”');           // 3e : "
+        tempResult = tempResult.replace(/QUOTE_PLACEHOLDER/, closeQuote);    // 4e : »
+        return tempResult;
+      } else {
+        // console.log(`❌ Pas d'imbrication détectée`);
+        // console.log(`  segment3StartsWithLowercase: ${segment3StartsWithLowercase}`);
+        // console.log(`  segment2IsShort: ${segment2IsShort}`);
+        // console.log(`  segment3NotEmpty: ${segment3NotEmpty}`);
       }
     }
   }
   
-  // Remplacer dans l'ordre inverse pour préserver les indices
-  for (let i = positions.length - 1; i >= 0; i--) {
-    const start = positions[i];
-    const end = start + "QUOTE_PLACEHOLDER".length;
-    result = result.substring(0, start) + replacements[i] + result.substring(end);
-  }
+  // Cas standard : alternance simple (ouvrant/fermant)
+  console.log(`🔄 Alternance simple pour ${totalQuotes} guillemets`);
+  let quoteIndex = 0;
+  result = result.replace(/QUOTE_PLACEHOLDER/g, () => {
+    const isOpening = (quoteIndex % 2 === 0);
+    quoteIndex++;
+    return isOpening ? openQuote : closeQuote;
+  });
   
   return result;
 }
