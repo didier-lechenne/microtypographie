@@ -814,133 +814,114 @@ var LiveTypographyModule = class {
 };
 
 // src/core/typographyRules.ts
-var CompiledTypographyRules = class {
-  /**
-   * Compile et met en cache les règles pour éviter la recompilation
-   */
-  static getCompiledRules(settings) {
-    const key = this.createSettingsKey(settings);
-    if (!this.compiledRules.has(key)) {
-      this.compiledRules.set(key, this.compileOptimizedRules(settings));
-    }
-    return this.compiledRules.get(key);
-  }
-  static createSettingsKey(settings) {
-    return JSON.stringify({
-      openDoubleQuote: settings.openDoubleQuote,
-      closeDoubleQuote: settings.closeDoubleQuote,
-      openSingleQuote: settings.openSingleQuote,
-      frenchRulesEnabled: settings.frenchRulesEnabled,
-      dashesEnabled: settings.dashesEnabled,
-      skipEnDash: settings.skipEnDash,
-      ellipsisEnabled: settings.ellipsisEnabled,
-      guillemetsEnabled: settings.guillemetsEnabled
-    });
-  }
-  static compileOptimizedRules(settings) {
-    const frenchRules = [];
-    if (settings.openSingleQuote !== "'") {
-      frenchRules.push({
-        reg: /'/g,
-        repl: settings.openSingleQuote
-      });
-    }
-    if (settings.ellipsisEnabled) {
-      frenchRules.push({
-        reg: /\.{3,}/g,
-        repl: "\u2026"
-      });
-    }
-    if (settings.guillemetsEnabled) {
-      frenchRules.push(
-        { reg: /<</g, repl: "\xAB\u202F" },
-        { reg: />>/g, repl: "\u202F\xBB" }
-      );
-    }
-    frenchRules.push({
+var FRENCH_RULES = [
+  // Règles orthographiques
+  { reg: /(X|I|V)ème/g, repl: "$1e" },
+  { reg: /(X|I|V)eme/g, repl: "$1e" },
+  { reg: /(X|I|V)éme/g, repl: "$1e" },
+  { reg: /oe/g, repl: "\u0153" },
+  { reg: /OE/g, repl: "\u0152" },
+  { reg: /Oe/g, repl: "\u0152" },
+  { reg: /ae/g, repl: "\xE6" },
+  { reg: /AE/g, repl: "\xC6" },
+  { reg: /Ae/g, repl: "\xC6" },
+  // delete all spaces after «‹“[(
+  { reg: /([«‹"\[(])\s+/g, repl: "$1" },
+  // french open quotes
+  { reg: /\"([A-Za-zÀ-ÖØ-öø-ÿœŒ])/g, repl: "\xAB\u202F$1" },
+  // french close quotes - version améliorée
+  { reg: /([^\s][!?;:.,]?)\s*\"/g, repl: "$1\u202F\xBB" },
+  // real apostrophe
+  { reg: /\'/g, repl: "\u2019" },
+  // real suspension points
+  { reg: /\.{3,}/g, repl: "\u2026" },
+  // delete all spaces after «‹“[(
+  { reg: /([«‹"\[(])\s+/g, repl: "$1" },
+  // delete all spaces before punctuation !?;:»›”)].,
+  { reg: /\s+([!?;:»›")\]\.\,])/g, repl: "$1" },
+  // add narrow no break space before !?;»›
+  { reg: /([!?;»›])/g, repl: "\u202F$1" },
+  // add no break space before : (correctly handling existing spaces, but avoiding URLs)
+  { reg: /\s+(:)(?!\/\/)/g, repl: "\xA0$1" },
+  { reg: /([^\s:\/])(:)(?!\/\/)/g, repl: "$1\xA0$2" },
+  // add narrow no break space after «‹
+  { reg: /([«‹])/g, repl: "$1\u202F" },
+  // no break space after one letter words
+  { reg: /\s+([a-zà])\s+/gi, repl: " $1\xA0" },
+  // no break space into names
+  {
+    reg: /([A-ZÀ-ÖØŒ])([A-Za-zÀ-ÖØ-öø-ÿœŒ]+)\s+([A-ZÀ-ÖØŒ])([A-Za-zÀ-ÖØ-öø-ÿœŒ]+)/g,
+    repl: "$1$2\xA0$3$4"
+  },
+  // no break space after abbreviation with period
+  {
+    reg: /([A-ZÀ-ÖØŒ]\.)\s+([A-ZÀ-ÖØŒ][A-Za-zÀ-ÖØ-öø-ÿœŒ]+)/g,
+    repl: "$1\xA0$2"
+  },
+  // no break space before 'siècles'
+  { reg: /(X|I|V)(er|e)\s+siècle/g, repl: "$1$2\xA0si\xE8cle" },
+  // add sub
+  { reg: /(X|I|V)(er|e)/g, repl: "$1<sup>$2</sup>" },
+  // Transformer les guillemets simples à l'intérieur de guillemets doubles en guillemets anglais
+  { reg: /(«\u202F[^»]*)'([^’]*)'([^»]*\u202F»)/g, repl: '$1"$2"$3' },
+  // ajouter espace après guillemet fermant suivi d'un mot
+  { reg: /(»)([A-Za-zÀ-ÖØ-öø-ÿœŒ0-9])/g, repl: "$1 $2" },
+  // Transformer les guillemets simples à l'intérieur de guillemets doubles en guillemets anglais
+  { reg: /(«\u202F[^»]*)«\u202F([^»]*)\u202F»([^»]*\u202F»)/g, repl: "$1\u201C$2\u201D$3" }
+];
+var BASE_RULES = [
+  // Règles minimales pour les espaces qui ne sont pas spécifiques au français
+];
+function compileRules(settings) {
+  let frenchRules = [];
+  frenchRules.push(
+    {
       reg: new RegExp(`"([A-Za-z\xC0-\xD6\xD8-\xF6\xF8-\xFF\u0153\u0152])`, "g"),
       repl: settings.openDoubleQuote + "$1"
-    });
-    frenchRules.push({
-      reg: new RegExp(`([A-Za-z\xC0-\xD6\xD8-\xF6\xF8-\xFF\u0153\u0152][!?;:.,]?)\\s*"`, "g"),
+    },
+    {
+      reg: new RegExp(`([A-Za-z\xC0-\xD6\xD8-\xF6\xF8-\xFF\u0153\u0152][!?;:.,]?)"`, "g"),
       repl: "$1" + settings.closeDoubleQuote
+    },
+    // Apostrophe typographique personnalisable
+    { reg: /\'/g, repl: settings.openSingleQuote }
+  );
+  if (settings.ellipsisEnabled) {
+    frenchRules.push({ reg: /\.{3,}/g, repl: "\u2026" });
+  }
+  if (settings.guillemetsEnabled) {
+    frenchRules.push({ reg: /<</g, repl: "\xAB\u202F" }, { reg: />>/g, repl: "\u202F\xBB" });
+  }
+  if (settings.frenchRulesEnabled) {
+    frenchRules = [...frenchRules, ...FRENCH_RULES];
+    frenchRules.push({
+      reg: /(«\u202F[^»]*)«\u202F([^»]*)\u202F»([^»]*\u202F»)/g,
+      repl: "$1\u201C$2\u201D$3"
     });
-    if (settings.frenchRulesEnabled) {
-      frenchRules.push(
-        // Ligatures - patterns spécifiques et rapides
-        { reg: /\boe\b/g, repl: "\u0153" },
-        { reg: /\bOe\b/g, repl: "\u0152" },
-        { reg: /\bOE\b/g, repl: "\u0152" },
-        { reg: /\bae\b/g, repl: "\xE6" },
-        { reg: /\bAe\b/g, repl: "\xC6" },
-        { reg: /\bAE\b/g, repl: "\xC6" },
-        // Ordinaux - patterns non-greedy
-        { reg: /(X|I|V)(ème|eme|éme)/g, repl: "$1e" },
-        // Nettoyer les espaces normaux SEULEMENT (préserver les espaces fines)
-        { reg: /[ \t]+([!?;:»›")\]\.\,])/g, repl: "$1" },
-        // Espaces typographiques - application directe
-        { reg: /([!?;»›])/g, repl: "\u202F$1" },
-        { reg: /([^\s:\/])(:)(?!\/\/)/g, repl: "$1\xA0$2" },
-        // Guillemets avec cleanup atomique
-        { reg: /([«‹])\s*/g, repl: "$1\u202F" },
-        // Mots courts - pattern très spécifique
-        { reg: /\s([aày])\s/gi, repl: " $1\xA0" },
-        // Noms composés
-        {
-          reg: /([A-ZÀ-ÖØŒ])([A-Za-zÀ-ÖØ-öø-ÿœŒ]+)\s+([A-ZÀ-ÖØŒ])([A-Za-zÀ-ÖØ-öø-ÿœŒ]+)/g,
-          repl: "$1$2\xA0$3$4"
-        },
-        // Abréviations - pattern précis
-        {
-          reg: /([A-ZÀ-ÖØŒ]\.)\s+([A-ZÀ-ÖØŒ][A-Za-zÀ-ÖØ-öø-ÿœŒ]+)/g,
-          repl: "$1\xA0$2"
-        },
-        // Siècles - pattern non-ambigu
-        { reg: /(X|I|V)(er|e)\s+siècle/g, repl: "$1$2\xA0si\xE8cle" },
-        // Exposants après siècles
-        { reg: /(X|I|V)(er|e)/g, repl: "$1<sup>$2</sup>" },
-        // Guillemets imbriqués
-        { reg: /(«\u202F[^»]*)'([^']*)'([^»]*\u202F»)/g, repl: "$1\u201C$2\u201D$3" },
-        { reg: /(«\u202F[^»]*)«\u202F([^»]*)\u202F»([^»]*\u202F»)/g, repl: "$1\u201C$2\u201D$3" }
-        // Espace après guillemet fermant
-        // { reg: /(»)([A-Za-zÀ-ÖØ-öø-ÿœŒ0-9])/g, repl: "$1 $2" }
+  } else {
+    frenchRules = [...frenchRules, ...BASE_RULES];
+  }
+  const dashRules = [];
+  if (settings.dashesEnabled) {
+    if (settings.skipEnDash) {
+      dashRules.push({ reg: /--/g, repl: "\u2014" });
+    } else {
+      dashRules.push(
+        { reg: /--/g, repl: "\u2013" },
+        // -- devient –
+        { reg: /–-/g, repl: "\u2014" },
+        // –- devient —
+        { reg: /—-/g, repl: "---" }
+        // —- devient ---
       );
     }
-    const dashRules = [];
-    if (settings.dashesEnabled) {
-      if (settings.skipEnDash) {
-        dashRules.push({ reg: /--/g, repl: "\u2014" });
-      } else {
-        dashRules.push(
-          { reg: /--/g, repl: "\u2013" },
-          { reg: /–-/g, repl: "\u2014" },
-          { reg: /—-/g, repl: "---" }
-        );
-      }
-    }
-    return { frenchRules, dashRules };
   }
-  /**
-   * Nettoie le cache (utile pour les tests ou changements fréquents)
-   */
-  static clearCache() {
-    this.compiledRules.clear();
-  }
-};
-CompiledTypographyRules.compiledRules = /* @__PURE__ */ new Map();
-function compileRules(settings) {
-  return CompiledTypographyRules.getCompiledRules(settings);
+  return { frenchRules, dashRules };
 }
 function applyRules(text, rules) {
-  if (!text || text.length === 0) {
-    return text;
-  }
   let result = text;
   for (const rule of rules) {
-    if (rule.reg.test(result)) {
-      rule.reg.lastIndex = 0;
-      result = result.replace(rule.reg, rule.repl);
-    }
+    result = result.replace(rule.reg, rule.repl);
   }
   return result;
 }
