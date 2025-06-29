@@ -1,6 +1,6 @@
 {
   "name": "microtypographie",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Automatic typographic apostrophe, French quotation marks and dialog mark for Obsidian",
   "main": "main.js",
   "scripts": {
