@@ -129,50 +129,9 @@ export default class Microtypographie extends Plugin {
         }
     }
 
-    async loadSettings() {
-        // Charger les données brutes sauvegardées
-        const savedData = await this.loadData();
-        
-        // Créer un nouvel objet de paramètres en partant des valeurs par défaut
-        this.settings = Object.assign({}, DEFAULT_SETTINGS);
-        
-        // Si des paramètres ont été sauvegardés, les copier dans les nouvelles propriétés
-        if (savedData) {
-            // Copier uniquement les propriétés qui existent dans la nouvelle interface
-            Object.keys(this.settings).forEach(key => {
-                if (key in savedData) {
-                    (this.settings as any)[key] = (savedData as any)[key];
-                }
-            });
-            
-            // Migration des anciennes propriétés vers les nouvelles
-            // Cette partie est exécutée seulement si les anciennes propriétés existent
-            if ('apostrophe' in savedData || 'quotationmarks' in savedData || 'emdashes' in savedData) {
-                console.log("Migration des paramètres de Microtypographie vers la nouvelle version");
-                
-                // Si ces anciennes options étaient désactivées, on vide les paramètres correspondants
-                // pour désactiver les fonctionnalités
-                if (savedData.apostrophe === false) {
-                    this.settings.openSingleQuote = "'";  // Apostrophe standard
-                    this.settings.closeSingleQuote = "'";
-                }
-                
-                if (savedData.quotationmarks === false) {
-                    this.settings.openDoubleQuote = "\"";  // Guillemet standard
-                    this.settings.closeDoubleQuote = "\"";
-                }
-                
-                // Sauvegarder immédiatement les paramètres migrés
-                await this.saveSettings();
-            }
-        }
-    }
-
     async saveSettings() {
         await this.saveData(this.settings);
         
-      
-
         // Mettre à jour les modules avec les nouveaux paramètres
         this.liveModule.updateSettings(this.settings);
         this.batchModule.updateSettings(this.settings);
@@ -213,3 +172,4 @@ export default class Microtypographie extends Plugin {
         removeTabTitleBarButton(this.tabTitleBarButton);
     }
 }
+

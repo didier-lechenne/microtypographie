@@ -49,8 +49,8 @@ export class BatchTypographyModule {
             selectionEnd.line
         );
         
-        // Traiter le texte avec les règles compilées
-        const processedText = processTextWithBlocks(selection, blocks.lineTypes, rules);
+        // Traiter le texte avec les règles compilées et les paramètres
+        const processedText = processTextWithBlocks(selection, blocks.lineTypes, rules, this.settings);
         
         // Vérifier si le texte a changé
         if (processedText === selection) {
@@ -101,6 +101,7 @@ export class BatchTypographyModule {
             selection, 
             blocks.lineTypes, 
             rules, 
+            this.settings,
             (processedText) => {
                 editor.replaceSelection(processedText);
                 editor.setSelection(selectionStart, selectionEnd);

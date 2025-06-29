@@ -31,16 +31,13 @@ const FRENCH_RULES: TypographicRule[] = [
   { reg: /AE/g, repl: "Æ" },
   { reg: /Ae/g, repl: "Æ" },
 
-    // delete all spaces after «‹“[(
-  { reg: /([«‹"\[(])\s+/g, repl: "$1" },
-
   // real apostrophe
-  { reg: /\'/g, repl: "’" },
+  { reg: /\'/g, repl: "'" },
   // real suspension points
   { reg: /\.{3,}/g, repl: "\u2026" },
-  // delete all spaces after «‹“[(
+  // delete all spaces after «‹"[(
   { reg: /([«‹"\[(])\s+/g, repl: "$1" },
-  // delete all spaces before punctuation !?;:»›”)].,
+  // delete all spaces before punctuation !?;:»›")].,
   { reg: /\s+([!?;:»›")\]\.\,])/g, repl: "$1" },
   // add narrow no break space before !?;»›
   { reg: /([!?;»›])/g, repl: "\u202F$1" },
@@ -67,17 +64,15 @@ const FRENCH_RULES: TypographicRule[] = [
   // add sub
   { reg: /(X|I|V)(er|e)/g, repl: "$1<sup>$2</sup>" },
   // Transformer les guillemets simples à l'intérieur de guillemets doubles en guillemets anglais
-  { reg: /(«\u202F[^»]*)'([^’]*)'([^»]*\u202F»)/g, repl: '$1"$2"$3' },
+  { reg: /(«\u202F[^»]*)'([^']*)'([^»]*\u202F»)/g, repl: '$1"$2"$3' },
   // ajouter espace après guillemet fermant suivi d'un mot
   { reg: /(»)([A-Za-zÀ-ÖØ-öø-ÿœŒ0-9])/g, repl: "$1 $2" },
   // Transformer les guillemets simples à l'intérieur de guillemets doubles en guillemets anglais
-  { reg: /(«\u202F[^»]*)«\u202F([^»]*)\u202F»([^»]*\u202F»)/g, repl: '$1\“$2\”$3'  },
+  { reg: /(«\u202F[^»]*)«\u202F([^»]*)\u202F»([^»]*\u202F»)/g, repl: '$1"$2"$3'  },
 ];
 
 // Règles de base pour les espaces (non spécifiques au français)
-const BASE_RULES: TypographicRule[] = [
-
-];
+const BASE_RULES: TypographicRule[] = [];
 
 /**
  * Compile l'ensemble des règles typographiques en fonction des paramètres
@@ -90,19 +85,27 @@ export function compileRules(
   // Initialiser le tableau de règles
   let frenchRules: TypographicRule[] = [];
 
-  // Règles pour les guillemets personnalisables et apostrophes (toujours actives)
+  // Règles pour les guillemets - approche par alternance
   frenchRules.push(
+    // Remplacer tous les guillemets par une fonction personnalisée
     {
-      reg: new RegExp(`"([A-Za-zÀ-ÖØ-öø-ÿœŒ])`, "g"),
-      repl: settings.openDoubleQuote + "$1",
+      reg: /"/g,
+      repl: "QUOTE_PLACEHOLDER"
     },
+    // Nettoyer tous les espaces après les placeholders de guillemets ouvrants
     {
-      reg: new RegExp(`([A-Za-zÀ-ÖØ-öø-ÿœŒ](?:\\s*[!?;:.,])?)\\s*"`, "g"),
-      repl: "$1" + settings.closeDoubleQuote,
+      reg: /QUOTE_PLACEHOLDER\s+/g,
+      repl: "QUOTE_PLACEHOLDER"
     },
-    // Apostrophe typographique personnalisable
-    { reg: /\'/g, repl: settings.openSingleQuote }
+    // Nettoyer tous les espaces avant les placeholders de guillemets fermants
+    {
+      reg: /\s+QUOTE_PLACEHOLDER/g,
+      repl: "QUOTE_PLACEHOLDER"
+    }
   );
+
+  // Apostrophe typographique personnalisable
+  frenchRules.push({ reg: /\'/g, repl: settings.openSingleQuote });
 
   // Traitement des points de suspension si activé
   if (settings.ellipsisEnabled) {
@@ -121,7 +124,7 @@ export function compileRules(
     // Ajouter la règle pour les guillemets anglais dans les guillemets français
     frenchRules.push({ 
       reg: /(«\u202F[^»]*)«\u202F([^»]*)\u202F»([^»]*\u202F»)/g, 
-      repl: '$1\“$2\”$3'  
+      repl: '$1"$2"$3'  
     });
   } else {
     frenchRules = [...frenchRules, ...BASE_RULES];
@@ -148,18 +151,88 @@ export function compileRules(
 }
 
 /**
+ * Traite les guillemets avec détection simple de l'imbrication par proximité
+ * @param text Texte avec les placeholders QUOTE_PLACEHOLDER
+ * @param openQuote Guillemet français ouvrant
+ * @param closeQuote Guillemet français fermant
+ * @returns Texte avec les guillemets traités
+ */
+function processQuotes(text: string, openQuote: string, closeQuote: string): string {
+  let result = text;
+  
+  // Stratégie simple : chercher les paires de guillemets "proches" (imbriqués)
+  // et les traiter différemment des paires "éloignées" (séparées)
+  
+  // Trouver toutes les positions
+  const positions = [];
+  let index = 0;
+  while ((index = result.indexOf("QUOTE_PLACEHOLDER", index)) !== -1) {
+    positions.push(index);
+    index += "QUOTE_PLACEHOLDER".length;
+  }
+  
+  // Grouper les guillemets par proximité
+  const groups = [];
+  let currentGroup = [];
+  
+  for (let i = 0; i < positions.length; i++) {
+    currentGroup.push(i);
+    
+    // Si c'est le dernier ou si le suivant est "loin", fermer le groupe
+    if (i === positions.length - 1 || 
+        (i < positions.length - 1 && 
+         positions[i + 1] - positions[i] > 100)) { // Plus de 100 caractères = groupe séparé
+      
+      groups.push([...currentGroup]);
+      currentGroup = [];
+    }
+  }
+  
+  // Déterminer le type de chaque guillemet
+  const replacements = new Array(positions.length);
+  
+  for (const group of groups) {
+    if (group.length === 2) {
+      // Groupe de 2 = paire simple
+      replacements[group[0]] = openQuote;  // ouvrant
+      replacements[group[1]] = closeQuote; // fermant
+    } else if (group.length === 4) {
+      // Groupe de 4 = imbrication probable
+      replacements[group[0]] = openQuote;  // ouvrant principal
+      replacements[group[1]] = ' “';        // ouvrant imbriqué
+      replacements[group[2]] = '” ';        // fermant imbriqué
+      replacements[group[3]] = closeQuote; // fermant principal
+    } else {
+      // Autres cas : alternance simple dans le groupe
+      for (let i = 0; i < group.length; i++) {
+        const isOpening = (i % 2 === 0);
+        replacements[group[i]] = isOpening ? openQuote : closeQuote;
+      }
+    }
+  }
+  
+  // Remplacer dans l'ordre inverse pour préserver les indices
+  for (let i = positions.length - 1; i >= 0; i--) {
+    const start = positions[i];
+    const end = start + "QUOTE_PLACEHOLDER".length;
+    result = result.substring(0, start) + replacements[i] + result.substring(end);
+  }
+  
+  return result;
+}
+
+/**
  * Applique une série de règles typographiques à un texte
  * @param text Texte d'entrée
  * @param rules Règles à appliquer
+ * @param settings Paramètres pour le traitement des guillemets
  * @returns Texte transformé
  */
-export function applyRules(text: string, rules: TypographicRule[]): string {
+export function applyRules(text: string, rules: TypographicRule[], settings?: MicrotypographieSettings): string {
   let result = text;
   for (const rule of rules) {
     const before = result;
     result = result.replace(rule.reg, rule.repl);
-    
-    // Log seulement si il y a eu un changement
     if (before !== result) {
       console.log("🔄 Règle appliquée:");
       console.log("   Regex:", rule.reg);
@@ -168,5 +241,15 @@ export function applyRules(text: string, rules: TypographicRule[]): string {
       console.log("---");
     }
   }
+  
+  // Traitement spécial des guillemets si des paramètres sont fournis
+  if (settings && result.includes("QUOTE_PLACEHOLDER")) {
+    console.log("🔄 Traitement des guillemets par alternance");
+    console.log("   Avant:", result);
+    result = processQuotes(result, settings.openDoubleQuote, settings.closeDoubleQuote);
+    console.log("   Après:", result);
+    console.log("---");
+  }
+  
   return result;
 }
