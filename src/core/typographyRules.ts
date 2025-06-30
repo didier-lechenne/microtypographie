@@ -220,21 +220,21 @@ export function applyRules(text: string, rules: TypographicRule[], settings?: Mi
     const before = result;
     result = result.replace(rule.reg, rule.repl);
     if (before !== result) {
-      // console.log("🔄 Règle appliquée:");
-      // console.log("   Regex:", rule.reg);
-      // console.log("   Avant:", before);
-      // console.log("   Après:", result);
-      // console.log("---");
+      console.log("🔄 Règle appliquée:");
+      console.log("   Regex:", rule.reg);
+      console.log("   Avant:", before);
+      console.log("   Après:", result);
+      console.log("---");
     }
   }
   
   // Traitement spécial des guillemets si des paramètres sont fournis
   if (settings && result.includes("QUOTE_PLACEHOLDER")) {
-    // console.log("🔄 Traitement des guillemets par alternance");
-    // console.log("   Avant:", result);
+    console.log("🔄 Traitement des guillemets par alternance");
+    console.log("   Avant:", result);
     result = processQuotes(result, settings.openDoubleQuote, settings.closeDoubleQuote);
-    // console.log("   Après:", result);
-    // console.log("---");
+    console.log("   Après:", result);
+    console.log("---");
   }
   
   return result;
