@@ -627,18 +627,6 @@ function isInPreservedMarkdown(editor) {
   }
   return false;
 }
-async function injectCSSFromFile(plugin, fileName) {
-  try {
-    const pluginDir = plugin.manifest.dir;
-    const filePath = `${pluginDir}/${fileName}`;
-    const cssContent = await plugin.app.vault.adapter.read(filePath);
-    const styleEl = document.createElement("style");
-    styleEl.textContent = cssContent;
-    document.head.appendChild(styleEl);
-  } catch (error) {
-    console.error("\xC9chec de chargement du fichier CSS:", error);
-  }
-}
 
 // src/modules/liveTypography.ts
 var LiveTypographyModule = class {
@@ -957,10 +945,19 @@ function applyRules(text, rules, settings) {
     const before = result;
     result = result.replace(rule.reg, rule.repl);
     if (before !== result) {
+      console.log("\u{1F504} R\xE8gle appliqu\xE9e:");
+      console.log("   Regex:", rule.reg);
+      console.log("   Avant:", before);
+      console.log("   Apr\xE8s:", result);
+      console.log("---");
     }
   }
   if (settings && result.includes("QUOTE_PLACEHOLDER")) {
+    console.log("\u{1F504} Traitement des guillemets par alternance");
+    console.log("   Avant:", result);
     result = processQuotes(result, settings.openDoubleQuote, settings.closeDoubleQuote);
+    console.log("   Apr\xE8s:", result);
+    console.log("---");
   }
   return result;
 }
@@ -1155,7 +1152,6 @@ var Microtypographie = class extends import_obsidian3.Plugin {
     this.batchModule = new BatchTypographyModule(this.settings);
     this.addSettingTab(new MicrotypographieSettingTab(this.app, this));
     this.registerDomEvent(document, "keydown", this.handleKeyDown.bind(this));
-    await injectCSSFromFile(this, "styles.css");
     this.registerEditorExtension(createDecorations(this.settings));
     if (this.settings.highlightButton) {
       this.statusBarButton = createStatusBarButton(
